@@ -1,0 +1,75 @@
+<%- include('./includes/header') %>
+<div class="row mt-5">
+    <div class="col-md-10 m-auto">
+        <div class="card card-body jumbotron">
+            <h1 class="text-center mb-5">
+                <i class="fas fa-user"></i> Profile
+            </h1>
+            <%- include('./partials/messages') %>
+            <div class="row">
+                <div class="column">
+                    <a href="/photos/upload_photos?edit=1"><i class="fas fa-pen-square pen-photo"></i></a>
+                    <% let pages = [user.p1, user.p2, user.p3, user.p4, user.p5]; %>
+                    <% let j = user.amount; %>
+                    <% if (pages[page - 1] != '') { %>
+                        <% let photo = pages[page - 1]; %>
+                        <img src="/uploads/<%= photo %>" id="pimg" class="<%= (j == 1) ? 'rounded' : ''%>"style="width:100%">
+                    <% } %>
+                    <h3>
+                        <% if (j > 1) { %>
+                                <div class="container-page">
+                                <% for (i = 1; i <= j; i++) { %>
+                                    <a href="?page=<%= i %>" class="index-page <%= page == i ? 'active-page' : ''%>"><%= i %></a>
+                                <% } %>
+                            </div>
+                        <% } %>
+                    </h3>
+                    <% if (page != 1) { %>
+                        <div class="button-cont">
+                            <button onclick="remove()" class="remove"><i class="fas fa-minus-circle"></i> Remove this picture</button>
+                        </div>
+                    <% } %>
+                </div>
+                <div class="column">
+                    <a href="/profile/edit"><i class="fas fa-pen-square pen-info"></i></a>
+                    <div class="card border-light mb-3">
+                        <div class="card-header">Personal Info</div>
+                        <div class="card-body">
+                            <h5 class="card-title">Name</h4>
+                                <p class="card-text"><%= user.fname + ' ' + user.lname %></p>
+                            <h5 class="card-title">Username</h4>
+                                <p class="card-text"><%= user.username %></p>
+                            <h5 class="card-title">Bio</h4>
+                                <p class="card-text"><%= user.bio %></p>
+                            <h5 class="card-title">Gender</h4>
+                                <p class="card-text"><%= user.gender %></p>
+                            <h5 class="card-title">Orientation</h4>
+                                <p class="card-text"><%= user.orientation %></p>
+                            <h5 class="card-title">Tags</h4>
+                                <p class="card-text">#<%= user.tags.join(' #') %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function isMobileDevice() {
+            return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+    }
+
+    function remove() {
+        if (!confirm("Do you want to remove this picture?")) {
+            return
+        }
+        page = window.location.href[window.location.href.length - 1];
+        if (isMobileDevice() == true) {
+            fetch('https://api.ipify.org/?format=json')
+                .then(results => results.json())
+                .then(data => window.location = 'http://84.198.113.229:5000/photos/remove?photo=' + page)
+        } else {
+            window.location = 'http://localhost:5000/photos/remove?photo=' + page;
+        }
+    }
+</script>

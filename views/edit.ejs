@@ -1,0 +1,61 @@
+<%- include('./includes/header') %>
+<div class="row mt-5">
+    <div class="col-md-6 m-auto">
+        <div class="card card-body jumbotron">
+            <h1 class="text-center mb-3">
+                <i class="fas fa-user-plus"></i> Edit Personal Info
+            </h1>
+            <%- include('./partials/messages') %>
+            <form action="/profile/edit" method="POST">
+                <div class="form-group">
+                    <label for="fname">First Name</label>
+                    <input type="name" id="fname" name="fname" class="form-control" placeholder="Enter First Name"
+                        value="<%= typeof user.fname != 'undefined' ? user.fname : '' %>" />
+                </div>
+                <div class="form-group">
+                    <label for="lname">Last Name</label>
+                    <input type="name" id="lname" name="lname" class="form-control" placeholder="Enter Last Name"
+                        value="<%= typeof user.lname != 'undefined' ? user.lname : '' %>" />
+                </div>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="name" id="username" name="username" class="form-control" placeholder="Enter Username"
+                        value="<%= typeof user.username != 'undefined' ? user.username : '' %>" />
+                </div>
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" name="gender" class="form-control" placeholder="Male or female"
+                        value="<%= typeof user.gender != 'undefined' ? user.gender : '' %>">
+                        <option>Male</option>
+                        <option>Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="orientation">Sexual Orientation</label>
+                    <select type="text" id="orientation" name="orientation" class="form-control"
+                        placeholder="Heterosexual, bisexual or homosexual"
+                        value="<%= typeof user.orientation != 'undefined' ? user.orientation : '' %>">
+                        <option>Heterosexual</option>
+                        <option>Homosexual</option>
+                        <option>Bisexual</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tags">Tags</label>
+                    <input type="text" id="tags" name="tags" class="form-control"
+                        placeholder="Your interests. Seperate the different tags by a space!"
+                        value="<%= typeof user.tags != 'undefined' ? user.tags.join(' ') : '' %>" />
+                </div>
+                <div class="form-group">
+                    <label for="bio">Biography</label>
+                    <textarea type="text" id="bio" name="bio" class="form-control"
+                        rows="3" value="<%= typeof user.bio != 'undefined' ? user.bio : '' %>"><%= user.bio %></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    Save
+                </button>
+            </form>
+            <p class="lead mt-4">Have An Account? <a href="/users/login">Login</a></p>
+        </div>
+    </div>
+</div>

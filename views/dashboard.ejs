@@ -1,4 +1,32 @@
 <%- include('./includes/header') %>
 <%- include('./partials/messages') %>
-<h1 class="mt-4">Dashboard</h1>
-<p class="lead mb-3">Welcome <b><%= user.username %></b>!</p>
+<h1 class="mt-4">Explore</h1>
+<p class="lead mb-3">Welcome back, <b><%= user.fname %></b>!</p>
+<br>
+<h3>Check out these people that are close to you!</h3>
+<br>
+<% if (profiles != undefined && profiles.length > 0) { %>
+    <% profiles.forEach(profile => { %>
+        <!-- <div class="row mt-5">
+            <div class="col-md-10 m-auto">
+                <div class="card card-body border-primary bg-"> -->
+                <div class="jumbotron" style="padding: 15px 25px 0px 25px;">
+                    <div class="row">
+                        <div class="column-explore1">
+                            <img class="images-explore" src="/uploads/<%= profile.p1 %>">
+                        </div>
+                        <div class="column-explore2">
+                            <div class="card border-dark mb-3">
+                                <div class="card-header" style="font-size: 20px; font-weight: bold;"><%= profile.fname + ' ' + profile.lname %></div>
+                                <div class="card-body">
+                                    <h5 class="card-text"><%= profile.bio %></h5>
+                                    <p class="card-text">#<%= profile.tags.join(' #') %></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <!-- </div>
+        </div> -->
+    <% }) %>
+<% } %>

@@ -38,16 +38,26 @@ router.post('/edit', (req, res) => {
 
     if (username != req.user.username) {
         unameL = req.user.username.length;
+        let photos = [];
         glob(req.user.username + "*", { matchBase: true, nodir: true }, (er, files) => {
-        // glob("public/uploads/*", (er, files) => {
-            console.log(files);
             files.forEach(item => {
                 let file = item.slice(15);
-                console.log(file);
                 fs.rename(path.join(__dirname, '../public/uploads/' + file), path.join(__dirname, '../public/uploads/' + username + file.slice(unameL)), function (err) {
                     if (err) console.log('ERROR: ' + err);
                 });
-            })
+                photos.push(username + file.slice(unameL));
+            });
+            let j = photos.length;
+            for (i = j; i < 5; i++) {
+                photos.push('');
+            }
+            console.log(photos);
+            console.log(req.user.email);
+            User.updateOne({ email: req.user.email },
+                { $set: { p1: photos[0], p2: photos[1], p3: photos[2], p4: photos[3], p5: photos[4] } }).then(() => {
+                    console.log("data updated");
+                })
+                .catch(err => console.log(err));
         });
     }
 
@@ -68,7 +78,7 @@ router.post('/edit', (req, res) => {
                     'success_msg',
                     'Your profile has been updated!'
                 );
-                res.redirect('/profile?page=1');
+                res.redirect('/dashboard');
             })
             .catch(err => console.log(err));
         }

@@ -34,6 +34,16 @@
     flex: 50%;
 }
 
+.column-explore2 {
+    padding: 10px;
+    flex: 80%;
+}
+
+.column-explore1 {
+    padding: 10px;
+    flex: 15%;
+}
+
 .file-input {
     width: 80%;
 }
@@ -55,6 +65,13 @@
 .images {
     width: 90px;
     height: 120px;
+    object-fit: cover;
+    border-radius: 5%;
+}
+
+.images-explore {
+    width: 150px;
+    height: 150px;
     object-fit: cover;
     border-radius: 5%;
 }
@@ -133,21 +150,35 @@ input[type="file"] {
     margin-bottom: -20px;
 }
 
+.image-btn-cont {
+  position: relative;
+  width: 100%;
+}
+
 .pen-photo {
-    color: #EB6864;
-    font-size: 25px;
-    position: absolute;
-    margin-top: 10px;
-    margin-left: 10px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  color: #EB6864;
+  font-size: 25px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
 .pen-info {
-    color: #EB6864;
-    font-size: 25px;
-    position: absolute;
-    margin-top: 10px;
-    margin-left: 390px;
-    z-index: 1;
+  position: absolute;
+  top: 20px;
+  right: -2px;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  color: #EB6864;
+  font-size: 25px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
 .header {

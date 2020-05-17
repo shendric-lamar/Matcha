@@ -86,63 +86,63 @@ router.post('/register', (req, res) => {
                     password,
                     password2
                 }); 
-            }
-        })
-        .catch(err => console.log(err));
-
-        User.findOne({ email: email }).then(user => {
-            if (user) {
-                errors.push({ msg: 'Email address is already in use!' });
-                res.render('register', {
-                    errors,
-                    fname,
-                    lname,
-                    username,
-                    email,
-                    password,
-                    password2
-                });
             } else {
-                const key = uniqid();
-                const newUser = new User({
-                    fname,
-                    lname,
-                    username,
-                    email,
-                    password,
-                    key
-                });
-
-                bcrypt.genSalt(10, (err, salt) => {
-                    bcrypt.hash(newUser.password, salt, (err, hash) => {
-                        if (err) throw err;
-                        newUser.password = hash;
-                        flag = sendEmail(username, key, email)
-                        if (flag == 1) {
-                            newUser
-                                .save()
-                                .then(user => {
-                                    req.flash(
-                                        'success_msg',
-                                        'You are now registered! Please click the link in the email we sent you to activate your account!'
-                                    );
-                                    res.redirect('/users/login');
-                                })
-                                .catch(err => console.log(err));
-                        } else {
-                            errors.push({ msg: 'Something went wrong, please try again later...' });
-                            res.render('register', {
-                                errors,
-                                fname,
-                                lname,
-                                username,
-                                email,
-                                password,
-                                password2
+                User.findOne({ email: email }).then(user => {
+                    if (user) {
+                        errors.push({ msg: 'Email address is already in use!' });
+                        res.render('register', {
+                            errors,
+                            fname,
+                            lname,
+                            username,
+                            email,
+                            password,
+                            password2
+                        });
+                    } else {
+                        const key = uniqid();
+                        const newUser = new User({
+                            fname,
+                            lname,
+                            username,
+                            email,
+                            password,
+                            key
+                        });
+        
+                        bcrypt.genSalt(10, (err, salt) => {
+                            bcrypt.hash(newUser.password, salt, (err, hash) => {
+                                if (err) throw err;
+                                newUser.password = hash;
+                                flag = sendEmail(username, key, email)
+                                if (flag == 1) {
+                                    newUser
+                                        .save()
+                                        .then(user => {
+                                            req.flash(
+                                                'success_msg',
+                                                'You are now registered! Please click the link in the email we sent you to activate your account!'
+                                            );
+                                            res.redirect('/users/login');
+                                        })
+                                        .catch(err => console.log(err));
+                                } else {
+                                    errors.push({ msg: 'Something went wrong, please try again later...' });
+                                    res.render('register', {
+                                        errors,
+                                        fname,
+                                        lname,
+                                        username,
+                                        email,
+                                        password,
+                                        password2
+                                    });
+                                }
                             });
-                        }
-                    });
-                });
+                        });
+                    }
+                })
+                .catch(err => console.log(err));
             }
         })
         .catch(err => console.log(err));

@@ -44,7 +44,6 @@ router.get('/dashboard', ensureAuthenticated, ensureCompleted, (req, res) => {
             }
         }).catch(err => console.log(err));
     }
-    console.log(profiles);
 });
 
 // Profile Completion Page

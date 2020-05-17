@@ -16,32 +16,33 @@ router.get('/dashboard', ensureAuthenticated, ensureCompleted, (req, res) => {
     if (index > -1) {
         genders.splice(index, 1);
     }
-    if (req.user.orientation == "Heterosexual" || req.user.orientation == "Bisexual") {
+    if (req.user.orientation == "Heterosexual") {
         User.find({ gender: genders[0], completedPics: true, orientation: { $in: ["Heterosexual", "Bisexual"] }, username: { $ne: req.user.username }}).then(users => {
-            if (req.user.orientation == "Bisexual") {
-                profiles = profiles.concat(users);
-            } else {
-                res.render('dashboard', {
-                    user: req.user,
-                    profiles: users
-                });
-            }
+            res.render('dashboard', {
+                user: req.user,
+                profiles: users
+            });
         }).catch(err => console.log(err));
     }
-    if (req.user.orientation == "Homosexual" || req.user.orientation == "Bisexual") {
+    if (req.user.orientation == "Homosexual") {
         User.find({ gender: req.user.gender, completedPics: true, orientation: { $in: ["Homosexual", "Bisexual"] }, username: { $ne: req.user.username }}).then(users => {
-            if (req.user.orientation == "Bisexual") {
+            res.render('dashboard', {
+                user: req.user,
+                profiles: users
+            });
+        }).catch(err => console.log(err));
+    }
+    if (req.user.orientation == "Bisexual") {
+        User.find({ gender: req.user.gender, completedPics: true, orientation: { $in: ["Homosexual", "Bisexual"] }, username: { $ne: req.user.username } }).then(users => {
+            profiles = profiles.concat(users);
+            User.find({ gender: genders[0], completedPics: true, orientation: { $in: ["Heterosexual", "Bisexual"] }, username: { $ne: req.user.username } }).then(users => {
                 profiles = profiles.concat(users);
+                console.log(profiles);
                 res.render('dashboard', {
                     user: req.user,
                     profiles: profiles
                 });
-            } else {
-                res.render('dashboard', {
-                    user: req.user,
-                    profiles: users
-                });
-            }
+            })
         }).catch(err => console.log(err));
     }
 });

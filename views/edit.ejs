@@ -24,20 +24,17 @@
                 </div>
                 <div class="form-group">
                     <label for="gender">Gender</label>
-                    <select id="gender" name="gender" class="form-control" placeholder="Male or female"
-                        value="<%= typeof user.gender != 'undefined' ? user.gender : '' %>">
-                        <option>Male</option>
-                        <option>Female</option>
+                    <select id="gender" name="gender" class="form-control" placeholder="Male or female">
+                        <option selected="<%= user.gender = 'Male' ? 'selected' : ''%>">Male</option>
+                        <option selected="<%= user.gender = 'Female' ? 'selected' : ''%>">Female</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="orientation">Sexual Orientation</label>
-                    <select type="text" id="orientation" name="orientation" class="form-control"
-                        placeholder="Heterosexual, bisexual or homosexual"
-                        value="<%= typeof user.orientation != 'undefined' ? user.orientation : '' %>">
-                        <option>Heterosexual</option>
-                        <option>Homosexual</option>
-                        <option>Bisexual</option>
+                    <select type="text" id="orientation" name="orientation" class="form-control">
+                        <option selected="<%= user.orientation = 'Heterosexual' ? 'selected' : ''%>">Heterosexual</option>
+                        <option selected="<%= user.orientation = 'Homosexual' ? 'selected' : ''%>">Homosexual</option>
+                        <option selected="<%= user.orientation = 'Bisexual' ? 'selected' : ''%>">Bisexual</option>
                     </select>
                 </div>
                 <div class="form-group">

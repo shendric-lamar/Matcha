@@ -6,17 +6,43 @@ const path = require('path');
 const { ensureCompleted, ensureAuthenticated, forwardAuthenticated } = require('../config/auth');
 const User = require('../models/User');
 
+function getAge(dateString) {
+    var today = new Date();
+    var birthDate = new Date(dateString);
+    var age = today.getFullYear() - birthDate.getFullYear();
+    var m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+}
+
 router.get('/', ensureAuthenticated, ensureCompleted, (req, res) => {
-    if (req.query.page > req.user.amount) {
-        res.render('profile', {
-            user: req.user,
-            page: 1
-        });
+    if (typeof req.query.user != 'undefined') {
+        User.findOne({ username: req.query.user }).then(user => {
+            res.render('profile', {
+                user: user,
+                page: req.query.page,
+                age: getAge(user.dob),
+                flag: 1
+            });
+        }).catch(err => console.log(err));
     } else {
-        res.render('profile', {
-            user: req.user,
-            page: req.query.page
-        });
+        if (req.query.page > req.user.amount) {
+            res.render('profile', {
+                user: req.user,
+                page: 1,
+                age: getAge(req.user.dob),
+                flag: 0
+            });
+        } else {
+            res.render('profile', {
+                user: req.user,
+                page: req.query.page,
+                age: getAge(req.user.dob),
+                flag: 0
+            });
+        }
     }
 });
 

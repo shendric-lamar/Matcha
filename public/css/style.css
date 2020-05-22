@@ -27,11 +27,24 @@
 
 .row {
     display: flex;
+    position: relative
 }
 
 .column {
     padding: 10px;
     flex: 50%;
+}
+
+.column-header2 {
+    padding: 10px;
+    margin-left: -140px;
+    flex: 86%;
+}
+
+.column-header1 {
+    margin-left: 10px;
+    padding: 10px;
+    flex: 12%;
 }
 
 .column-explore2 {
@@ -47,20 +60,6 @@
 .file-input {
     width: 80%;
 }
-
-/* .image-cropper {
-    height: 120px;
-    width: 90px;
-    position: relative;
-    overflow: hidden;
-    border-radius: 5%;
-} */
-
-/* .images {
-    height: 100%;
-    margin: 0 auto;
-    width: 100%;
-} */
 
 .images {
     width: 90px;
@@ -155,6 +154,15 @@ input[type="file"] {
   width: 100%;
 }
 
+.name-profile {
+  position: absolute;
+  top: 6px;
+  left: 40px;
+  /* transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%); */
+  color: #fff;
+}
+
 .pen-photo {
   position: absolute;
   top: 20px;
@@ -183,6 +191,12 @@ input[type="file"] {
 
 .header {
     margin-bottom: 20px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-right: solid 1px darkgray;
+    border-left: solid 1px darkgray;
+    border-bottom: solid 1px darkgray;
+    background-color: whitesmoke;
 }
 
 .remove { 
@@ -207,4 +221,219 @@ input[type="file"] {
 
 .rounded {
     border-radius: 5px;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 5px;  
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%; 
+  background: #EB6864;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #EB6864;
+  cursor: pointer;
+}
+
+.profile-link {
+    color: #000;
+}
+
+.profile-link:hover {
+    text-decoration: none;
+    color: #000;
+}
+
+.dislike {
+    position: absolute;
+    font-size: 45px;
+    color: #EB6864;
+    top: -6px;
+    left: 138px;
+}
+
+.like {
+    position: absolute;
+    font-size: 40px;
+    color: #EB6864;
+    top: 0px;
+    left: 0px;
+}
+
+.stars-outer {
+    display: inline-block;
+    position: relative;
+    font-family: FontAwesome;
+    font-weight: 100;
+}
+ 
+.stars-outer::before {
+    color: gray;
+    content: "\f006 \f006 \f006 \f006 \f006";
+}
+ 
+.stars-inner {
+    font-family: FontAwesome;
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+}
+ 
+.stars-inner::before {
+    content: "\f005 \f005 \f005 \f005 \f005";
+    color: #f8ce0b;
+    font-weight: 100;
+}
+
+.toggler {
+    color: #EB6864;
+}
+
+div.responsive:hover {
+  cursor: pointer;
+}
+
+div.desc {
+  padding: 0px;
+  text-align: center;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.responsive {
+    margin: 10px;
+    background-color: whitesmoke;
+    padding: 0 7px;
+    float: left;
+    width: 184px;
+    border-radius: 5px;
+    position: relative;
+}
+
+@media only screen and (max-width: 700px) {
+  .responsive {
+    width: 184px;
+    margin: 10px;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .responsive {
+    width: 184px;
+  }
+  .gallery {
+       text-align: center;
+  }
+}
+
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.icon-message {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 30px;
+}
+
+.image-chat {
+    width: 20px;
+}
+
+/* tell the container's children to float left: */
+.float > * {
+    float:left;
+    margin-right:5px;
+}
+
+/* this is called a clearfix. it makes sure that the container's children floats are cleared, without using extra markup */
+
+.clearfix {
+    *zoom:1 /* for IE */
+}
+
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+/* .image-cropper {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 50%;
+    margin-right: 25px;
+} */
+
+.image-chat {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5%;
+    margin-right: 15px;
+}
+
+.chat {
+    overflow: scroll;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.chat::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE and Edge */
+.chat {
+    -ms-overflow-style: none;
+}
+
+#messages {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+}
+
+#messages li {
+    padding: 10px 20px;
+    background-color: whitesmoke;
+    /* display: inline-block; */
+    border-radius: 15px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.me {
+    color:  #EB6864;
 }

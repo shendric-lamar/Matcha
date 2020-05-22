@@ -40,6 +40,9 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: 0
     },
+    dob: {
+        type: Date
+    },
     gender: {
         type: String,
         enum: ["male", "female"],
@@ -82,11 +85,30 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    long: {
-        type: String,
-        default: ''
+    agemin: {
+        type: Number,
+        default: 18
+    },
+    agemax: {
+        type: Number,
+        default: 65
+    },
+    likes: {
+        type: Array,
+        default: []
+    },
+    dislikes: {
+        type: Array,
+        default: []
+    },
+    rating: {
+        type: Number,
+        default: 0
+    },
+    matches: {
+        type: Array,
+        default: []
     }
-
 });
 
 const User = mongoose.model('User', UserSchema);

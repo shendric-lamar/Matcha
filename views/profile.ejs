@@ -1,32 +1,41 @@
 <%- include('./includes/header') %>
+<% function calcRating(x) { %>
+    <% return (1 / (1 + Math.exp(-(0.01 * x))) * 100); %>
+<% } %>
 <div class="row mt-5">
     <div class="col-md-10 m-auto">
         <div class="card card-body jumbotron">
             <h1 class="text-center mb-5">
-                <i class="fas fa-user"></i> Profile
+                <i class="fas fa-user"></i> <%= user.fname + ', ' + age %>
+                <div class="stars-outer">
+                    <div class="stars-inner"></div>
+                </div>
+                <p hidden class="card-text rating"><%= calcRating(user.rating) %></p>
             </h1>
             <%- include('./partials/messages') %>
             <div class="row">
                 <div class="column">
                     <div class="image-btn-cont">
-                        <a href="/photos/upload_photos?edit=1"><i class="fas fa-pen-square pen-photo"></i></a>
+                        <% if (flag != 1) { %>
+                            <a href="/photos/upload_photos?edit=1"><i class="fas fa-pen-square pen-photo"></i></a>
+                        <% } %>
                         <% let pages = [user.p1, user.p2, user.p3, user.p4, user.p5]; %>
                         <% let j = user.amount; %>
                         <% if (pages[page - 1] != '') { %>
                             <% let photo = pages[page - 1]; %>
-                            <img src="/uploads/<%= photo %>" id="pimg" class="<%= (j == 1) ? 'rounded' : ''%>" style="width:100%">
+                            <img src="/uploads/<%= photo %>" id="pimg" class="<%= (j == 1) ? 'rounded' : ''%>" onerror="this.onerror=null; this.src='/img/image-not-available.jpg'" style="width:100%">
                         <% } %>
                     </div>
                     <h3>
                         <% if (j > 1) { %>
                                 <div class="container-page">
                                 <% for (i = 1; i <= j; i++) { %>
-                                    <a href="?page=<%= i %>" class="index-page <%= page == i ? 'active-page' : ''%>"><%= i %></a>
+                                    <a href="<%= flag == 1 ? '?user=' + user.username + '&page=' + i : '?page=' + i %>" class="index-page <%= page == i ? 'active-page' : ''%>"><%= i %></a>
                                 <% } %>
                             </div>
                         <% } %>
                     </h3>
-                    <% if (page != 1) { %>
+                    <% if (page != 1 && flag != 1) { %>
                         <div class="button-cont">
                             <button onclick="remove()" class="remove"><i class="fas fa-minus-circle"></i> Remove this picture</button>
                         </div>
@@ -35,11 +44,13 @@
                 <div class="column">
                     <div class="card border-light mb-3">
                         <div class="image-btn-cont"></div>
+                            <% if (flag != 1) { %>
                             <a href="/profile/edit"><i class="fas fa-pen-square pen-info"></i></a>
+                             <% } %>
                             <div class="card-header">Personal Info</div>
                             <div class="card-body">
-                                <h5 class="card-title">Name</h5>
-                                    <p class="card-text"><%= user.fname + ' ' + user.lname %></p>
+                                <h5 class="card-title">Last name</h5>
+                                <p class="card-text"><%= user.fname %></p>
                                 <h5 class="card-title">Username</h5>
                                     <p class="card-text"><%= user.username %></p>
                                 <h5 class="card-title">Bio</h5>
@@ -76,4 +87,8 @@
             window.location = 'http://localhost:5000/photos/remove?photo=' + page;
         }
     }
+
+    let rating = document.querySelector(".rating").innerHTML;
+    document.querySelector(".stars-inner").style.width = rating + '%';
+
 </script>

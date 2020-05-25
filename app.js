@@ -5,9 +5,9 @@ const flash = require('connect-flash');
 const session = require('express-session');
 const passport = require('passport');
 const app = express();
-var http = require('http').createServer(app);
+const uniqid = require('uniqid');
+const http = require('http').createServer(app);
 const io = require('socket.io')(http)
-
 
 // Set static folder
 app.use(express.static("public"));
@@ -53,29 +53,71 @@ app.use((req, res, next) => {
     next();
 });
 
-io.sockets.on('connection', function (socket) {
-    const users = [];
+const User = require('./models/User');
+const Msg = require('./models/Msg');
+const Room = require('./models/Room');
 
-    socket.on('login', function(data){
-        users[socket.id] = data.userId;
-        console.log(users);
+io.sockets.on('connection', function (socket) {
+
+    socket.on('login', function(username) {
+        User.updateOne({ username: username }, { $set: { socket: socket.id } }).catch(err => console.log(error));
     });
 
     socket.on('recipient', function (recipient) {
         socket.recipient = recipient;
     });
     
-    socket.on('username', function (username) {
-        socket.username = username;
-        io.emit('is_online', '🔵 <i>' + socket.username + ' has joined the chat..</i>');
+    socket.on('join', function (user1, user2) {
+        Room.findOne({ $and: [{ $or: [{ user1: user1 }, { user2: user1 }] }, { $or: [{ user1: user2 }, { user2: user2 }] }] }).then((room) => {
+            if(room) {
+                socket.join(room.id);
+                Msg.find({ $and: [{ $or: [{ from: user1 }, { to: user1 }] }, { $or: [{ from: user2 }, { to: user2 }] }] })
+                .sort({ date: 1})
+                .then((msgs) => {
+                    msgs.forEach(msg => {
+                        if (user1 == msg.from) {
+                            io.to(socket.id).emit('chat_message', msg.content, user1, user2);
+                        } else {
+                            io.to(socket.id).emit('chat_message', msg.content, user2, user1);
+                        }
+                    });
+                    io.to(socket.id).emit('focus');
+                }).catch(err => console.log(err));
+            } else {
+                let id = uniqid();
+                const newRoom = new Room({
+                    id,
+                    user1,
+                    user2
+                });
+                newRoom
+                    .save()
+                    .catch(err => console.log(err));
+                socket.join(id);
+            }
+        }).catch(err => console.log(err));
     });
 
     socket.on('disconnect', function (username) {
         io.emit('is_online', '🔴 <i>' + socket.username + ' has left the chat..</i>');
     })
 
-    socket.on('chat_message', function (message, username, recipient) {
-        io.emit('chat_message', '<strong>' + socket.username + '</strong>: ' + message, socket.username, socket.recipient);
+    socket.on('chat_message', function (message, user1, user2) {
+        Room.findOne({ $and: [{ $or: [{ user1: user1 }, { user2: user1 }] }, { $or: [{ user1: user2 }, { user2: user2 }] }] }).then((room) => {
+            const newMsg = new Msg({
+                roomId: room.id,
+                content: message,
+                from: user1,
+                to: user2,
+                date: Date.now()
+            });
+            newMsg
+                .save()
+                .then(() => {
+                    io.to(room.id).emit('chat_message', message, user1, user2);
+                })
+                .catch(err => console.log(err));
+        }).catch(err => console.log(err));
     });
 
 });

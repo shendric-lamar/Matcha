@@ -68,5 +68,5 @@
 <script>
     var username = document.querySelector("#username").innerHTML;
     var socket = io();
-    socket.emit('login', {userId: username})
+    socket.emit('login', username);
 </script>

@@ -108,6 +108,10 @@ const UserSchema = new mongoose.Schema({
     matches: {
         type: Array,
         default: []
+    },
+    socket: {
+        type: String,
+        default: ""
     }
 });
 

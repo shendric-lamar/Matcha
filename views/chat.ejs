@@ -7,11 +7,12 @@
                 <div class="image-cropper">
                     <img src="/uploads/<%= recip.p1 %>" onerror="this.onerror=null; this.src='/img/image-not-available.jpg'" class="image-chat" width=100>
                 </div>
-                <h1 id="recipient"><%= recip.fname %></h1>
+                <h1 ><%= recip.fname %></h1>
+                <p id="recipient" style="visibility: hidden;"><%= recip.username %></p>
             </div>
         </div>
         <div class="card-body chat">
-            <ul id="messages" style="height: 40px;"></ul>
+            <ul id="messages"></ul>
         </div>
     </div>
     <form action="">
@@ -20,7 +21,7 @@
             <input id="txt" autocomplete="off" class="form-control" type="text" style="width: 100%;" />
         </div>
     </form>
-    <p id="username" style="visibility: hidden;"><%= user.fname %></p>
+    <p id="username" style="visibility: hidden;"><%= user.username %></p>
 </body>
 <script>
     $(function () {
@@ -31,18 +32,17 @@
         // submit text message without reload/refresh the page
         $('form').submit(function (e) {
             e.preventDefault(); // prevents page reloading
-            socket.emit('chat_message', $('#txt').val(), 'username', user);
+            socket.emit('chat_message', $('#txt').val(), user, recip);
             $('#txt').val('');
             return false;
         });
 
         // append the chat text message
         socket.on('chat_message', function (msg, username, recipient) {
-            if (username == user && recipient == recip) {
-                $('#messages').append($('<li class="me">').html(msg));
-            }
-            else if (username == recip && recipient == user) {
-                $('#messages').append($('<li class="you">').html(msg));
+            if (user == username) {
+                 $('#messages').append('<li><div class="me">' + msg + '</div></li><div style="clear: both" />');
+            } else {
+                $('#messages').append('<li><div class="you">' + msg + '</div></li><div style="clear: both" />');
             }
         });
 
@@ -54,7 +54,12 @@
         });
 
         // ask username
-        socket.emit('username', user);
-        socket.emit('recipient', recip)
+        socket.emit('join', user, recip);
+        socket.emit('recipient', recip);
+        socket.emit('focus');
+
+        socket.on('focus', function () {
+            $(".messages").animate({ scrollTop: $('.messages').prop("scrollHeight") }, 1000);
+        })
     });
 </script>

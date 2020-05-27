@@ -24,7 +24,8 @@ router.get('/', ensureAuthenticated, ensureCompleted, (req, res) => {
                 user: user,
                 page: req.query.page,
                 age: getAge(user.dob),
-                flag: 1
+                flag: 1,
+                viewer: req.user
             });
         }).catch(err => console.log(err));
     } else {

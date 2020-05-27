@@ -1,3 +1,7 @@
+<% if (user.completedPics == 1) { %>
+    <%- include('./includes/header') %> 
+<% } %>
+<div id="here"></div>
 <div class="row mt-5">
     <div class="col-md-6 m-auto">
         <div class="card card-body jumbotron">
@@ -65,6 +69,8 @@
             </form>
         </div>
     </div>
+    <p id="username" style="visibility: hidden"><%= user.username %></p>
+    <p id="flag" style="visibility: hidden"><%= user.completedPics %></p>
 </div>
 <script>
     function readURL(input, tag) {
@@ -90,5 +96,19 @@
         });
         $("#input5").change(function () {
             readURL(this, '#p5');
+        });
+        var user = document.querySelector("#username").innerHTML;
+        var flag = document.querySelector("#flag").innerHTML;
+        console.log(flag);
+        socket.emit('login', user);
+
+        socket.on('notif', (notif, user, user2) => {
+            if (document.querySelector('#' + user) == null && flag == 'true') {
+                $("#here").append(
+                '<div id="' + user + '" class="alert alert-dismissible alert-primary" style="font-size: 15px;" role="alert">' + notif +
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                '<span aria-hidden="true">&times;</span>' +
+                '</button></div >');
+            }
         });
 </script>

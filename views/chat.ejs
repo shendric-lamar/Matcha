@@ -1,18 +1,48 @@
 <%- include('./includes/header') %>
+<% function GetFormattedDate(date) { %>
+    <% var now = new Date(); %>
+    <% var month = date.getMonth(); %>
+    <% var day = date.getDate(); %>
+    <% var hour = date.getHours(); %>
+    <% var mins = (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(); %>
+    <% if (now .getDate() == day && now .getMonth() == month) { %>
+        <% return "today at " + hour + ":" + mins; %>
+    <% } %>
+    <% return "on " + day + "/" + month + " " + hour + ":" + mins; %>
+<% } %>
 <script src="/socket.io/socket.io.js"></script>
 <body>
+    <div id="here"></div>
     <div class="card border-secondary mb-3" style="height: 600px;">
         <div class="card-header">
-            <div class="clearfix float">
+            <div id="namespace" class="clearfix float">
                 <div class="image-cropper">
-                    <img src="/uploads/<%= recip.p1 %>" onerror="this.onerror=null; this.src='/img/image-not-available.jpg'" class="image-chat" width=100>
+                    <a class="profile-link" href="/profile?user=<%= recip.username %>&page=1">
+                        <img src="/uploads/<%= recip.p1 %>" onerror="this.onerror=null; this.src='/img/image-not-available.jpg'" class="image-chat" width=100>
+                    </a>
                 </div>
-                <h1 ><%= recip.fname %></h1>
+                <h1 id="name"><%= recip.fname %></h1>
+                <% if (recip.online == true) { %>
+                    <div class="online"></div>
+                    <div class="last-online">Active Now</div>
+                <% } else { %>
+                    <div class="last-online">Last online <%= GetFormattedDate(recip.lastOnline) %></div>
+                <% } %>
                 <p id="recipient" style="visibility: hidden;"><%= recip.username %></p>
             </div>
         </div>
         <div class="card-body chat">
-            <ul id="messages"></ul>
+            <ul id="messages">
+                <% if (typeof msgs != 'undefined') { %>
+                    <% msgs.forEach(msg => { %>
+                        <% if (msg.from == user.username) { %>
+                            <li class="msg" tabindex="-1"><div class="me"><%= msg.content %></div></li><div style="clear: both"/>
+                        <% } else { %>
+                            <li class="msg" tabindex="-1"><div class="you"><%= msg.content %></div></li><div style="clear: both"/>
+                        <% } %>
+                    <% }); %>
+                <% } %>
+            </ul>
         </div>
     </div>
     <form action="">
@@ -25,41 +55,67 @@
 </body>
 <script>
     $(function () {
-        var socket = io();
+         function GetFormattedDate(date) { 
+            var now = new Date();  
+            var month = now.getMonth(); 
+            var day = now.getDate(); 
+            var hour = now.getHours(); 
+            var mins = now.getMinutes(); 
+            return "on " + day + "/" + month + " " + hour + ":" + mins; 
+        } 
+
         var user = document.querySelector("#username").innerHTML;
         var recip = document.querySelector("#recipient").innerHTML;
 
         // submit text message without reload/refresh the page
-        $('form').submit(function (e) {
+        $('form').submit((e) => {
             e.preventDefault(); // prevents page reloading
             socket.emit('chat_message', $('#txt').val(), user, recip);
+            socket.emit('notif', user, recip);
             $('#txt').val('');
             return false;
         });
 
         // append the chat text message
-        socket.on('chat_message', function (msg, username, recipient) {
+        socket.on('chat_message', (msg, username, recipient) => {
             if (user == username) {
-                 $('#messages').append('<li><div class="me">' + msg + '</div></li><div style="clear: both" />');
+                 $('#messages').append('<li id=' + msg + ' class="msg" tabindex="-1"><div class="me">' + msg + '</div></li><div style="clear: both" />').focus();
             } else {
-                $('#messages').append('<li><div class="you">' + msg + '</div></li><div style="clear: both" />');
+                $('#messages').append('<li id=' + msg + ' class="msg" tabindex="-1"><div class="you">' + msg + '</div></li><div style="clear: both" />').focus();
+            }
+            $(".chat").animate({ scrollTop: $(".chat")[0].scrollHeight}, 1000);
+        });
+
+        socket.on('online', (username) => {
+            if (user != username) {
+                $('#namespace').append('<div class="online"></div>');
+                $(".last-online").remove();
+                $('#namespace').append('<div class="last-online">Active Now</div>');
             }
         });
 
-        // append text if someone is online
-        socket.on('is_online', function (username) {
-            if (username == user && recipient == user) {
-                $('#messages').prepend($('<li>').html(username));
+        socket.on('offline', () => {
+            console.log("test");
+            $(".online").remove();
+            $(".last-online").remove();
+            $('#namespace').append('<div class="last-online">Last Active ' + GetFormattedDate(Date.now()) + '</div>');
+        });
+
+        socket.on('notif', (notif, user, recipient) => {    
+            if (document.querySelector('#' + user) == null && recip != recipient) {
+                $("#here").append(
+                    '<div id="' + user + '" class="alert alert-dismissible alert-primary" style="font-size: 15px; margin-bottom: 20px;" role="alert">' + notif +
+                    '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                    '<span aria-hidden="true">&times;</span>' +
+                    '</button></div >');
             }
         });
 
-        // ask username
+        $(".chat").animate({ scrollTop: $(".chat")[0].scrollHeight }, 500);
+
         socket.emit('join', user, recip);
         socket.emit('recipient', recip);
-        socket.emit('focus');
-
-        socket.on('focus', function () {
-            $(".messages").animate({ scrollTop: $('.messages').prop("scrollHeight") }, 1000);
-        })
+        socket.emit('username', user);
+        socket.emit('login', user);
     });
 </script>

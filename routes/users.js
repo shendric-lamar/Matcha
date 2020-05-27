@@ -39,7 +39,9 @@ const { forwardAuthenticated } = require('../config/auth');
 
 // Login Page
 router.get('/login', (req, res) => {
-    res.render('login')
+    res.render('login', {
+        user: req.query.logged_out
+    })
 });
 
 // Register Page
@@ -186,9 +188,12 @@ router.post('/login', passport.authenticate('local', { failureRedirect: '/users/
 
 // Logout
 router.get('/logout', (req, res) => {
-    req.logout();
-    req.flash('success_msg', 'You are now logged out!');
-    res.redirect('/users/login');
+    User.updateOne({ username: req.user.username }, { $set: { online: false, lastOnline: Date.now()}}).then(() => {
+        let user = req.user.username;
+        req.logout();
+        req.flash('success_msg', 'You are now logged out!');
+        res.redirect('/users/login?logged_out=' + user);
+    })
 });
 
 

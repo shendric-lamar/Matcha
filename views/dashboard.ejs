@@ -8,10 +8,10 @@
     <% if (m < 0 || (m===0 && today.getDate() < birthDate.getDate())) { age--; } %>
     <% return age; %>
 <% } %>
+<div id="here"></div>
 <h1 class="mt-4 explore">Explore</h1>
 <p class="lead mb-3">Welcome back, <b><%= user.fname %></b>!</p>
 <br>
-<p id="username" style="visibility: hidden"><%= user.username %></p>
 <div class="card border-primary mb-3" style="max-width: 20rem;">
     <div class="card-header"><h4>Age preference</h4></div>
     <div class="card-body">
@@ -34,6 +34,7 @@
         </form>
     </div>
 </div>
+<p id="user" style="visibility: hidden"><%= user.username %></p>
 <% if (profiles != undefined && profiles.length > 0) { %>
     <h3>Check out these people that are close to you!</h3>
     <br>
@@ -55,10 +56,11 @@
                             </div>
                         </div>
                     </div>
-                    <a href="/action/dislike?user=<%= profile.username %>"><i class="fas fa-times dislike"></i></a>
-                    <a href="/action/like?user=<%= profile.username %>"><i class="fas fa-heart like"></i></a>
+                    <a href="/action/dislike?user=<%= profile.username %>" ><i class="fas fa-times dislike"></i></a>
+                    <a href="/action/like?user=<%= profile.username %>" onclick="like()"><i class="fas fa-heart like"></i></a>
                 </div>
             </div>
+            <p id="liked" style="visibility: hidden;"><%= profile.username %></p>
         <% } %>
     <% }) %>
 <% } else { %>
@@ -66,7 +68,23 @@
     <br>
 <% } %>
 <script>
-    var username = document.querySelector("#username").innerHTML;
-    var socket = io();
+    var username = document.querySelector("#user").innerHTML;
+    // var liked = document.querySelector("#liked").innerHTML;
+    console.log(username);
     socket.emit('login', username);
+
+    function like() {
+        console.log("test");
+        socket.emit('like', username, liked);
+    }
+
+    socket.on('notif', (notif, user, user2) => {
+        if (document.querySelector('#' + user) == null) {
+            $("#here").append(
+            '<div id="' + user + '" class="alert alert-dismissible alert-primary" style="font-size: 15px;" role="alert">' + notif +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+            '<span aria-hidden="true">&times;</span>' +
+            '</button></div >');
+        }
+    });
 </script>

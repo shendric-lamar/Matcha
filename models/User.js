@@ -112,6 +112,18 @@ const UserSchema = new mongoose.Schema({
     socket: {
         type: String,
         default: ""
+    },
+    online: {
+        type: Boolean,
+        default: false
+    },
+    lastOnline: {
+        type: Date,
+        default: Date.now()
+    },
+    notif: {
+        type: Array,
+        default: []
     }
 });
 

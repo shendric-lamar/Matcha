@@ -3,8 +3,10 @@ const router = express.Router();
 const { ensureCompleted, ensureAuthenticated, forwardAuthenticated } = require('../config/auth');
 
 
-// Load User model
+// Load Models
 const User = require('../models/User');
+const Room = require('../models/Room');
+const Msg = require('../models/Msg');
 
 router.get('/chat', ensureAuthenticated, ensureCompleted, (req, res) => {
     if (req.query.me != req.user.username) {
@@ -15,10 +17,32 @@ router.get('/chat', ensureAuthenticated, ensureCompleted, (req, res) => {
         res.redirect('/dashboard');
     } else {
         User.findOne({ username: req.query.user }).then(user => {
-            res.render('chat', {
-                user: req.user,
-                recip: user
-            });
+            Room.findOne({ $and: [{ $or: [{ user1: req.query.me }, { user2: req.query.me }] }, { $or: [{ user1: req.query.user }, { user2: req.query.user }] }] }).then((room) => {
+                    if (room) {
+                    Msg.find({ roomId: room.id })
+                    .sort({ date: 1 })
+                    .then(msgs => {
+                        // let arr = [];
+                        // msgs.forEach(msg => {
+                        //     if (msg.from == req.query.me) {
+                        //         arr.push('<li><div class="me">' + msg.content + '</div></li><div style="clear: both" />');
+                        //     } else {
+                        //         arr.push('<li><div class="you">' + msg.content + '</div></li><div style="clear: both" />');
+                        //     }
+                        // });
+                        res.render('chat', {
+                            user: req.user,
+                            recip: user,
+                            msgs: msgs
+                        });
+                    }).catch(err => console.log(err));
+                } else {
+                    res.render('chat', {
+                        user: req.user,
+                        recip: user
+                    });
+                }
+            }).catch(err => console.log(err));
         }).catch(err => console.log(err)); 
     }
 });

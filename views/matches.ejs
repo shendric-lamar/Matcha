@@ -17,3 +17,8 @@
         </div>
     <% }) %>
 <% } %>
+<p id="username" style="visibility: hidden"><%= user.username %></p>
+<script>
+    var user = document.querySelector("#username").innerHTML;
+    socket.emit('login', user);
+</script>

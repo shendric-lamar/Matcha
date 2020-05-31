@@ -5,9 +5,13 @@ const passport = require('passport');
 const nodemailer = require('nodemailer');
 const uniqid = require('uniqid');
 
-function sendEmail(username, key, email) {
-    var text = '<h1>Welcome to Matcha!</h1>' + '<p>Please click the following link to activate your account: </p>' + '<a href="http://localhost:5000/users/activate?username=' + username + '&key=' + key + '">ACTIVATE</a>';
-    var flag = 1;
+function sendEmail(username, key, email, type) {
+    if (type == "registration") {
+        var text = '<h1>Welcome to Matcha!</h1>' + '<p>Please click the following link to activate your account: </p>' + '<a href="http://localhost:5000/users/activate?username=' + username + '&key=' + key + '">ACTIVATE</a>';
+    } else {
+        var text = '<h1>Reset your Matcha password!</h1>' + '<p>Please click the following link to reset your password: </p>' + '<a href="http://localhost:5000/users/reset?username=' + username + '&key=' + key + '">RESET</a>';
+    }
+        var flag = 1;
 
     transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -116,7 +120,7 @@ router.post('/register', (req, res) => {
                             bcrypt.hash(newUser.password, salt, (err, hash) => {
                                 if (err) throw err;
                                 newUser.password = hash;
-                                flag = sendEmail(username, key, email)
+                                flag = sendEmail(username, key, email, "registration");
                                 if (flag == 1) {
                                     newUser
                                         .save()
@@ -233,8 +237,106 @@ router.get('/activate', (req, res) => {
             );
             res.redirect('/users/login');
         }
-    })
-    .catch(err => console.log(err));
+    }).catch(err => console.log(err));
+});
+
+router.get('/newpwd', (req, res) => {
+    res.render('newpwd');
+});
+
+router.post('/newpwd', (req, res) => {
+    const { email } = req.body;
+    User.findOne({ email: email }).then(user => {
+        if (user) {
+            const key = uniqid();
+            User.updateOne({ email: email }, { $set: { key: key }}).then(() => {
+                if (sendEmail(user.username, key, email, "newpwd")) {
+                    req.flash(
+                        'success_msg',
+                        'Email sent!'
+                    );
+                    res.redirect('login');
+                }
+            }).catch(err => console.log(err));
+        } else {
+            req.flash(
+                'error_msg',
+                'No user found with that email-address...'
+            );
+            res.render('newpwd');
+        }
+    }).catch(err => console.log(err));
+});
+
+router.get('/reset', (req, res) => {
+    if (typeof req.user == 'undefined') {
+        let username = req.query.username;
+        let key = req.query.key;
+        User.findOne({ username: username }).then(user => {
+            if (user) {
+                if (user.key == key) {
+                    res.render('reset', {
+                        username: user.username
+                    });
+                } else {
+                    req.flash(
+                        'error_msg',
+                        'Something went wrong... Please click the link in the email you received to reset your password!'
+                    );
+                    res.redirect('newpwd');
+                }
+            } else {
+                req.flash(
+                    'error_msg',
+                    'Something went wrong... Please click the link in the email you received to reset your password!'
+                );
+                res.redirect('newpwd');
+            }
+        }).catch(err => console.log(err));
+    } else {
+        res.render('reset', {
+            username: req.user.username
+        });
+    }
+});
+
+router.post('/reset', (req, res) => {
+    const { pwd, pwd2, username } = req.body;
+    let errors = [];
+
+    if (pwd != pwd2) {
+        errors.push({ msg: "Passwords don't match!" });
+    }
+    if (!pwd || !pwd2) {
+        errors.push({ msg: 'Please enter all fields' });
+    }
+    if (pwd.length < 6) {
+        errors.push({ msg: 'Password must be at least 6 characters' });
+    }
+
+    if (errors.length > 0) {
+        res.render('reset', {
+            username: username,
+            errors
+        });
+    } else {
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(pwd, salt, (err, hash) => {
+                if (err) throw err;
+                User.updateOne({ username: username }, { $set: { password: hash }}).then(() => {
+                    req.flash(
+                        'success_msg',
+                        'Your password has been updated!'
+                    );
+                    if (typeof req.user == 'undefined') {
+                        res.redirect('login');
+                    } else {
+                        res.redirect('../dashboard');
+                    }
+                }).catch(err => console.log(err));
+            });
+        });
+    }
 })
 
 module.exports = router;

@@ -93,6 +93,14 @@ const UserSchema = new mongoose.Schema({
         type: Number,
         default: 65
     },
+    famemin: {
+        type: Number,
+        default: 0
+    },
+    famemax: {
+        type: Number,
+        default: 100
+    },
     likes: {
         type: Array,
         default: []

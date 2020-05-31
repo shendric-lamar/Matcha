@@ -103,9 +103,9 @@
         socket.emit('login', user);
 
         socket.on('notif', (notif, user, user2) => {
-            if (document.querySelector('#' + user) == null && flag == 'true') {
+            if (flag == 'true') {
                 $("#here").append(
-                '<div id="' + user + '" class="alert alert-dismissible alert-primary" style="font-size: 15px;" role="alert">' + notif +
+                '<div class="alert alert-dismissible alert-primary" style="font-size: 15px;" role="alert">' + notif +
                 '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
                 '<span aria-hidden="true">&times;</span>' +
                 '</button></div >');

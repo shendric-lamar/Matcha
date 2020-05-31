@@ -8,30 +8,97 @@
     <% if (m < 0 || (m===0 && today.getDate() < birthDate.getDate())) { age--; } %>
     <% return age; %>
 <% } %>
+<% function calcRating(x) { %>
+    <% return (1 / (1 + Math.exp(-(0.01 * x))) * 100); %>
+<% } %>
 <div id="here"></div>
 <h1 class="mt-4 explore">Explore</h1>
 <p class="lead mb-3">Welcome back, <b><%= user.fname %></b>!</p>
 <br>
-<div class="card border-primary mb-3" style="max-width: 20rem;">
-    <div class="card-header"><h4>Age preference</h4></div>
-    <div class="card-body">
-        <form action="/age" method="POST">
-            <div class="form-group">
-                <label for="age-min">Minimum age</label>
-                <div class="slidecontainer">
-                    <input name="agemin" type="range" min="18" max="65" value="<%= typeof user.agemin != 'undefined' ? user.agemin : age - 6 %>" class="slider" id="myRange">
-                </div>
+<div class="row">
+    <div class="column-explore3">
+        <div class="card border-primary mb-3">
+            <div class="card-header"><h4>Age preference</h4></div>
+            <div class="card-body">
+                <form action="/age" method="POST">
+                    <div class="form-group">
+                        <label for="age-min">Minimum age</label>
+                        <div class="slidecontainer">
+                            <input name="agemin" type="range" min="18" max="65" value="<%= typeof user.agemin != 'undefined' ? user.agemin : age - 6 %>" class="slider" id="myRange">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="age-max">Maximum age</label>
+                        <div class="slidecontainer">
+                            <input name="agemax" type="range" min="18" max="65" value="<%= typeof user.agemax != 'undefined' ? user.agemax : age + 6 %>" class="slider" id="myRange">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary save-age">
+                        Save
+                    </button>
+                </form>
             </div>
-            <div class="form-group">
-                <label for="age-max">Maximum age</label>
-                <div class="slidecontainer">
-                    <input name="agemax" type="range" min="18" max="65" value="<%= typeof user.agemax != 'undefined' ? user.agemax : age + 6 %>" class="slider" id="myRange">
-                </div>
+        </div>
+    </div>
+    <div class="column-explore3">
+        <div class="card border-primary mb-3">
+            <div class="card-header">
+                <h4>Fame rating</h4>
             </div>
-            <button type="submit" class="btn btn-primary save-age">
-                Save
-            </button>
-        </form>
+            <div class="card-body">
+                <form action="/rating" method="POST">
+                    <div class="form-group">
+                        <label for="fame-min">Minimum rating</label>
+                        <div class="slidecontainer">
+                            <input name="famemin" type="range" min="0" max="100"
+                                value="<%= typeof user.famemin != 'undefined' ? user.famemin : 0 %>" class="slider"
+                                id="myRange" step="1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fame-max">Maximum rating</label>
+                        <div class="slidecontainer">
+                            <input name="famemax" type="range" min="0" max="100"
+                                value="<%= typeof user.famemax != 'undefined' ? user.famemax : 100 %>" class="slider"
+                                id="myRange" step="1">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary save-age">
+                        Save
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="column-explore3">
+        <div class="card border-primary mb-3">
+            <div class="card-header">
+                <h4>Distance</h4>
+            </div>
+            <div class="card-body">
+                <form action="/rating" method="POST">
+                    <div class="form-group">
+                        <label for="fame-min">Minimum distance (km)</label>
+                        <div class="slidecontainer">
+                            <input name="famemin" type="range" min="0" max="200"
+                                value="<%= typeof user.famemin != 'undefined' ? user.famemin : 0 %>" class="slider"
+                                id="myRange" step="1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fame-max">Maximum distance (km)</label>
+                        <div class="slidecontainer">
+                            <input name="famemax" type="range" min="0" max="200"
+                                value="<%= typeof user.famemax != 'undefined' ? user.famemax : 200 %>" class="slider"
+                                id="myRange" step="1">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary save-age">
+                        Save
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 <p id="user" style="visibility: hidden"><%= user.username %></p>
@@ -39,7 +106,7 @@
     <h3>Check out these people that are close to you!</h3>
     <br>
     <% profiles.forEach(profile => { %>
-        <% if (getAge(profile.dob) >= user.agemin && getAge(profile.dob) <= user.agemax) { %>
+        <% if ((getAge(profile.dob) >= user.agemin && getAge(profile.dob) <= user.agemax) && (calcRating(profile.rating) >= user.famemin && calcRating(profile.rating) <= user.famemax)) { %>
             <div class="jumbotron" style="padding: 15px 25px 0px 25px;">
                 <div class="row">
                     <a class="profile-link" href="/profile?user=<%= profile.username %>&page=1">
@@ -69,8 +136,15 @@
 <% } %>
 <script>
     var username = document.querySelector("#user").innerHTML;
-    // var liked = document.querySelector("#liked").innerHTML;
-    console.log(username);
+    var likedVar = document.querySelector("#liked");
+    if (likedVar != null) {
+        var liked = likedVar.innerHTML;
+    }
+    var match = window.location.search.slice(7);
+    console.log(match);
+    if (match != '') {
+        socket.emit('match', username, match);
+    }
     socket.emit('login', username);
 
     function like() {
@@ -79,12 +153,10 @@
     }
 
     socket.on('notif', (notif, user, user2) => {
-        if (document.querySelector('#' + user) == null) {
-            $("#here").append(
-            '<div id="' + user + '" class="alert alert-dismissible alert-primary" style="font-size: 15px;" role="alert">' + notif +
-            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-            '<span aria-hidden="true">&times;</span>' +
-            '</button></div >');
-        }
+        $("#here").append(
+        '<div class="alert alert-dismissible alert-primary" style="font-size: 15px;" role="alert">' + notif +
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+        '<span aria-hidden="true">&times;</span>' +
+        '</button></div >');
     });
 </script>

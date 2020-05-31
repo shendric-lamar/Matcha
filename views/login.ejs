@@ -1,4 +1,4 @@
-<script src="/socket.io/socket.io.js"></script>
+<!-- <script src="/socket.io/socket.io.js"></script> -->
 <div class="row mt-5">
     <div class="col-md-6 m-auto">
         <div class="card card-body jumbotron">
@@ -17,19 +17,12 @@
                 <button type="submit" class="btn btn-primary btn-block">Login</button>
             </form>
             <p class="lead mt-4">
-                No Account? <a href="/users/register">Register</a>
+                No Account Yet? <a href="/users/register">Register</a>
+            </p>
+            <p class="lead mt-4">
+                <a href="/users/newpwd">Forgot Your Password?</a>
             </p>
         </div>
     </div>
     <p id="name" style="visibility: hidden;"><%= typeof user != 'undefined' ? user : ''%></p>
 </div>
-<script>
-    $(function () {
-        var user = document.querySelector("#name").innerHTML;
-
-        console.log(user);
-        if (user != 'undefined') {
-            socket.emit('offline', user);
-        }
-    });
-</script>

@@ -21,7 +21,7 @@ function getAge(dateString) {
     return age;
 }
 
-function sortUsers(profiles, user) {
+function sortUsersTags(profiles, user) {
     const j = profiles.length;
     let matches = [];
     let amount = 0;
@@ -51,7 +51,7 @@ router.get('/dashboard', ensureAuthenticated, ensureCompleted, (req, res) => {
     }
     if (req.user.orientation == "Heterosexual") {
         User.find({ gender: genders[0], completedPics: true, orientation: { $in: ["Heterosexual", "Bisexual"] }, $and: [{ username: { $nin: req.user.likes } }, { username: { $ne: req.user.username } }, { username: { $nin: req.user.dislikes } }] }).then(users => {
-            users = sortUsers(users, req.user);
+            users = sortUsersTags(users, req.user);
             res.render('dashboard', {
                 user: req.user,
                 profiles: users,
@@ -61,7 +61,7 @@ router.get('/dashboard', ensureAuthenticated, ensureCompleted, (req, res) => {
     }
     if (req.user.orientation == "Homosexual") {
         User.find({ gender: req.user.gender, completedPics: true, orientation: { $in: ["Homosexual", "Bisexual"] }, $and: [{ username: { $nin: req.user.likes } }, { username: { $ne: req.user.username } }, { username: { $nin: req.user.dislikes } }] }).then(users => {
-            users = sortUsers(users, req.user);
+            users = sortUsersTags(users, req.user);
             res.render('dashboard', {
                 user: req.user,
                 profiles: users,
@@ -74,7 +74,7 @@ router.get('/dashboard', ensureAuthenticated, ensureCompleted, (req, res) => {
             profiles = profiles.concat(users);
             User.find({ gender: genders[0], completedPics: true, orientation: { $in: ["Heterosexual", "Bisexual"] }, $and: [{ username: { $nin: req.user.likes } }, { username: { $ne: req.user.username } }, { username: { $nin: req.user.dislikes } }] }).then(users => {
                 profiles = profiles.concat(users);
-                users = sortUsers(profiles, req.user);
+                users = sortUsersTags(profiles, req.user);
                 res.render('dashboard', {
                     user: req.user,
                     profiles: users,
@@ -88,6 +88,13 @@ router.get('/dashboard', ensureAuthenticated, ensureCompleted, (req, res) => {
 router.post('/age', ensureAuthenticated, (req, res) => {
     const { agemin, agemax } = req.body;
     User.updateOne({ username: req.user.username }, { $set: { agemin: agemin, agemax: agemax }}).then(user => {
+        res.redirect('/dashboard');
+    }).catch(err => console.log(err));
+});
+
+router.post('/rating', ensureAuthenticated, (req, res) => {
+    const { famemin, famemax } = req.body;
+    User.updateOne({ username: req.user.username }, { $set: { famemin: famemin, famemax: famemax } }).then(user => {
         res.redirect('/dashboard');
     }).catch(err => console.log(err));
 });

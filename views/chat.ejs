@@ -7,8 +7,9 @@
     <% var mins = (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(); %>
     <% if (now .getDate() == day && now .getMonth() == month) { %>
         <% return "today at " + hour + ":" + mins; %>
+    <% } else { %>
+        <% return "on " + day + "/" + month + " " + hour + ":" + mins; %>
     <% } %>
-    <% return "on " + day + "/" + month + " " + hour + ":" + mins; %>
 <% } %>
 <script src="/socket.io/socket.io.js"></script>
 <body>
@@ -61,7 +62,11 @@
             var day = now.getDate(); 
             var hour = now.getHours(); 
             var mins = now.getMinutes(); 
-            return "on " + day + "/" + month + " " + hour + ":" + mins; 
+            if (now.getDate() == day && now.getMonth() == month) {
+                 return "today at " + hour + ":" + mins;
+             } else {
+                 return "on " + day + "/" + month + " " + hour + ":" + mins;
+             }
         } 
 
         var user = document.querySelector("#username").innerHTML;
@@ -78,6 +83,7 @@
 
         // append the chat text message
         socket.on('chat_message', (msg, username, recipient) => {
+            msg = msg.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             if (user == username) {
                  $('#messages').append('<li id=' + msg + ' class="msg" tabindex="-1"><div class="me">' + msg + '</div></li><div style="clear: both" />').focus();
             } else {
@@ -95,16 +101,15 @@
         });
 
         socket.on('offline', () => {
-            console.log("test");
             $(".online").remove();
             $(".last-online").remove();
             $('#namespace').append('<div class="last-online">Last Active ' + GetFormattedDate(Date.now()) + '</div>');
         });
 
-        socket.on('notif', (notif, user, recipient) => {    
-            if (document.querySelector('#' + user) == null && recip != recipient) {
+        socket.on('notif', (notif, user, recipient) => { 
+            if (recip != user) {
                 $("#here").append(
-                    '<div id="' + user + '" class="alert alert-dismissible alert-primary" style="font-size: 15px; margin-bottom: 20px;" role="alert">' + notif +
+                    '<div class="alert alert-dismissible alert-primary" style="font-size: 15px; margin-bottom: 20px;" role="alert">' + notif +
                     '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
                     '<span aria-hidden="true">&times;</span>' +
                     '</button></div >');

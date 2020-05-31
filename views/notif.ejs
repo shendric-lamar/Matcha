@@ -51,10 +51,9 @@
     socket.on('notif', (notif, user, user2) => {
             if (document.querySelector('#' + user) == null) {
                 $("#no-new").remove();
-                let color = getRandomColor();
                 $("#messages").prepend(
                 '<li class="msg" tabindex="-1">' +
-                '<div class="notif"  style="border: background-color: ' + color + '">' + notif + '</div>' +
+                '<div class="notif"  style="background-color: ' + getRandomColor() + '">' + notif + '</div>' +
                 '</li>' +
                 '<div style="clear: both" />');
             }

@@ -73,11 +73,13 @@ router.get('/like', ensureAuthenticated, ensureCompleted, (req, res) => {
 
 router.get('/unmatch', ensureAuthenticated, ensureCompleted, (req, res) => {
     User.updateOne({ username: req.query.user }, { $pull: { likes: req.query.unmatched, matches: req.query.unmatched }, $push: { dislikes: req.query.unmatched }}).then(() => {
-        req.flash(
-            'success_msg',
-            'Unmatched!'
-        );
-        res.redirect('../matches');
+        User.updateOne({ username: req.query.unmatched }, { $pull: { likes: req.query.user, matches: req.query.user }, $push: { dislikes: req.query.user } }).then(() => {
+            req.flash(
+                'success_msg',
+                'Unmatched!'
+            );
+            res.redirect('../matches');
+        }).catch(err => console.log(err));
     }).catch(err => console.log(err));
 });
 

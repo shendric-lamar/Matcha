@@ -132,8 +132,31 @@ const UserSchema = new mongoose.Schema({
     notif: {
         type: Array,
         default: []
-    }
+    },
+    maxdistance: {
+        type: Number,
+        default: 200,
+    },
+    mindistance: {
+        type: Number,
+        default: 0,
+    },
+    showLoc: {
+        type: Boolean,
+        default: true
+    },
+    location: {
+        type: {
+            type: String,
+            default: "Point",
+        },
+        coordinates: {
+            type: [Number], //Coordinates lng then lat for $near to work
+            default: 0,
+        },
+    },
 });
+UserSchema.index({ location: '2dsphere' });
 
 const User = mongoose.model('User', UserSchema);
 

@@ -38,6 +38,17 @@ function sortUsersTags(profiles, user) {
     return (profiles);
 }
 
+function getLocation() {
+    navigator.geolocation.getCurrentPosition(showPosition);
+}
+function showPosition(position) {
+    var coords = { lat: position.coords.latitude, lng: position.coords.longitude };
+    console.log(coords);
+    var lat = position.coords.latitude;
+    var lng = position.coords.longitude;
+    console.log(lng, lat);
+}
+
 // Welcome Page
 router.get('/', forwardAuthenticated, (req, res) => res.render('welcome'));
 
@@ -99,6 +110,13 @@ router.post('/rating', ensureAuthenticated, (req, res) => {
     }).catch(err => console.log(err));
 });
 
+router.post('/distance', ensureAuthenticated, (req, res) => {
+    const { distancemin, distancemax } = req.body;
+    User.updateOne({ username: req.user.username }, { $set: { mindistance: distancemin, maxdistance: distancemax } }).then(user => {
+        res.redirect('/dashboard');
+    }).catch(err => console.log(err));
+});
+
 // Profile Completion Page
 router.get('/complete_profile', ensureAuthenticated, (req, res) => {
     if (req.user.completedInfo == true) {
@@ -111,11 +129,12 @@ router.get('/complete_profile', ensureAuthenticated, (req, res) => {
 });
 
 router.post('/complete_profile', (req, res) => {
-    const { dob, gender, orientation, tags, bio } = req.body;
+    const { dob, gender, orientation, tags, bio, lat, lng, showLoc } = req.body;
     let errors = [];
     const usernameLink = req.user.username;
+    console.log(lat, lng);
 
-    if (!dob || !gender || !orientation || !bio || !tags) {
+    if (!dob || !gender || !orientation || !bio || !tags || !showLoc) {
         errors.push({ msg: "Please fill in all fields!"});
     }
 
@@ -128,11 +147,20 @@ router.post('/complete_profile', (req, res) => {
             gender,
             orientation,
             tags,
-            bio
+            bio,
+            lat,
+            lng,
+            showLoc
         });
-    }    
+    }
+    
+    if (showLoc == "No") {
+        loc = false;
+    } else {
+        loc = true;
+    }
 
-    User.updateOne({ username: usernameLink }, { $set: { dob: dob, gender: gender, orientation: orientation, tags: tagsArray, bio: bio.trim()}}).then(() => {
+    User.updateOne({ username: usernameLink }, { $set: { dob: dob, gender: gender, orientation: orientation, tags: tagsArray, bio: bio.trim(), location: { coordinates: [lng, lat] }, showLoc: loc }}).then(() => {
         User.updateOne({ username: usernameLink }, { $set: { completedInfo: 1 } }).then(() => {
             res.redirect('/photos/upload_photos?user=' + req.user.username);
         });

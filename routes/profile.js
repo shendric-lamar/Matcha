@@ -64,10 +64,10 @@ router.get('/edit', ensureAuthenticated, ensureCompleted, (req, res) => {
 });
 
 router.post('/edit', (req, res) => {
-    const { fname, lname, username, gender, orientation, tags, bio } = req.body;
+    const { fname, lname, username, gender, orientation, tags, bio, lat, lng, showLoc} = req.body;
     let errors = [];
 
-    if (!fname || !lname || !username || !gender || !orientation || !bio || !tags || !pwd || !pwd2) {
+    if (!fname || !lname || !username || !gender || !orientation || !bio || !tags || !showLoc || !lat || !lng) {
         errors.push({ msg: "Please fill in all fields!" });
     }
 
@@ -115,17 +115,22 @@ router.post('/edit', (req, res) => {
                         errors
                     });
                 }
-                User.updateOne({ username: req.user.username }, { $set: { fname: fname, lname: lname, username: username, gender: gender, orientation: orientation, tags: tagsArray, bio: bio.trim() } }).then(() => {
+                if (showLoc == "No") {
+                    loc = false;
+                } else {
+                    loc = true;
+                }
+                User.updateOne({ username: req.user.username }, { $set: { fname: fname, lname: lname, username: username, gender: gender, orientation: orientation, tags: tagsArray, bio: bio.trim(), location: { coordinates: [lng, lat] }, showLoc: loc } }).then(() => {
                     req.flash(
                         'success_msg',
                         'Your profile has been updated!'
                     );
                     res.redirect('/dashboard');
                 })
-                .catch(err => console.log(err));
+                    .catch(err => console.log(err));
             }
         })
-        .catch(err => console.log(err));
+            .catch(err => console.log(err));
     }
 });
 

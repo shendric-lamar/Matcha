@@ -19,7 +19,7 @@ require('./config/passport')(passport);
 const db = require('./config/keys').MongoURI;
 
 // Connect to Mongo
-mongoose.connect(db, { useUnifiedTopology: true, useNewUrlParser: true })
+mongoose.connect(db, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true })
     .then(() => console.log('MongoDB Connected...'))
     .catch(err => console.log(err));
 
@@ -60,6 +60,7 @@ const Room = require('./models/Room');
 io.sockets.on('connection', (socket) => {
 
     socket.on('login', (username) => {
+        console.log("connected");
         User.updateOne({ username: username }, { $set: { socket: socket.id, online: true } }).catch(err => console.log(error));
         Room.find({ $or: [{ user1: username }, { user2: username }] }).then(rooms => {
             rooms.forEach(room => {
@@ -76,11 +77,11 @@ io.sockets.on('connection', (socket) => {
     socket.on('recipient', (recipient) => {
         socket.recipient = recipient;
     });
-    
+
     socket.on('join', (user1, user2) => {
         socket.username = user1;
         Room.findOne({ $and: [{ $or: [{ user1: user1 }, { user2: user1 }] }, { $or: [{ user1: user2 }, { user2: user2 }] }] }).then((room) => {
-            if(room) {
+            if (room) {
                 socket.join(room.id);
             } else {
                 let id = uniqid();
@@ -106,7 +107,7 @@ io.sockets.on('connection', (socket) => {
                 to: recip_name,
                 date: Date.now()
             });
-            newMsg 
+            newMsg
                 .save()
                 .then(() => {
                     io.to(room.id).emit('chat_message', message, sender_name, recip_name);
@@ -120,7 +121,7 @@ io.sockets.on('connection', (socket) => {
             User.findOne({ username: sender_name }).then(sender => {
                 io.to(recip.socket).emit('notif', sender.fname + ' has sent you a message!', sender.username, recip.username);
                 User.updateOne({ username: recip_name }, { $push: { notif: sender.fname + ' has sent you a message!' } })
-                .catch(err => console.log(err));
+                    .catch(err => console.log(err));
             }).catch(err => console.log(err));
         }).catch(err => console.log(err));
     });
@@ -131,15 +132,15 @@ io.sockets.on('connection', (socket) => {
                 User.findOne({ username: viewer_name }).then(viewer => {
                     io.to(profile.socket).emit('notif', viewer.fname + ' visited your profile!', viewer.username, profile.username);
                     User.updateOne({ username: profile_name }, { $push: { notif: viewer.fname + ' visited your profile!' } })
-                    .catch(err => console.log(error));
+                        .catch(err => console.log(error));
                 }).catch(err => console.log(err));
             }).catch(err => console.log(err));
         }
     });
 
     socket.on('markRead', (user) => {
-        User.updateOne({ username: user }, { $pull: { notif: { $exists: true } }})
-        .catch(err => console.log(err));
+        User.updateOne({ username: user }, { $pull: { notif: { $exists: true } } })
+            .catch(err => console.log(err));
     });
 
     socket.on('like', (user_name, liked_name) => {
@@ -147,39 +148,40 @@ io.sockets.on('connection', (socket) => {
             User.findOne({ username: user_name }).then(user => {
                 io.to(liked.socket).emit('notif', user.fname + ' has liked your profile!', user.username, liked.username);
                 User.updateOne({ username: liked_name }, { $push: { notif: user.fname + ' has liked your profile!' } })
-                .catch(err => console.log(error));
+                    .catch(err => console.log(error));
             }).catch(err => console.log(err));
         }).catch(err => console.log(err));
     });
 
     socket.on('match', (user_name, match_name) => {
-        User.findOne({ username: user_name}).then(user => {
+        User.findOne({ username: user_name }).then(user => {
             User.findOne({ username: match_name }).then(match => {
                 io.to(match.socket).emit('notif', 'You have a new match with ' + user.fname + '!', user.username, match.username);
                 User.updateOne({ username: match_name }, { $push: { notif: 'You have a new match with ' + user.fname + '!' } })
-                .catch(err => console.log(err));
+                    .catch(err => console.log(err));
                 io.to(user.socket).emit('notif', 'You have a new match with ' + user.fname + '!', user.username, match.username);
                 User.updateOne({ username: user_name }, { $push: { notif: 'You have a new match with ' + match.fname + '!' } })
-                .catch(err => console.log(err));
+                    .catch(err => console.log(err));
             }).catch(err => console.log(err));
         }).catch(err => console.log(err));
     });
 
     socket.on('unmatch', (user_name, unliked_name) => {
-        User.findOne({username : unliked_name}).then(unliked => {
-            User.findOne({ username: user_name}).then(user => {
+        User.findOne({ username: unliked_name }).then(unliked => {
+            User.findOne({ username: user_name }).then(user => {
                 io.to(unliked.socket).emit('notif', user.fname + ' has unmatched you...', user.username, unliked.username);
                 User.updateOne({ username: unliked_name }, { $push: { notif: user.fname + ' has unmatched you...' } })
-                .catch(err => console.log(err));
+                    .catch(err => console.log(err));
             }).catch(err => console.log(err));
         }).catch(err => console.log(err));
     });
 
     socket.on('disconnect', () => {
+        console.log("disconnected");
         User.findOne({ socket: socket.id }).then(user => {
             if (user) {
-                User.updateOne({ username: user.username }, { $set: { online: false }}).then(() => {
-                    Room.find({ $or: [ { user1: user.username }, {user2: user.username }]}).then(rooms => {
+                User.updateOne({ username: user.username }, { $set: { online: false } }).then(() => {
+                    Room.find({ $or: [{ user1: user.username }, { user2: user.username }] }).then(rooms => {
                         rooms.forEach(room => {
                             io.to(room.id).emit('offline');
                         });

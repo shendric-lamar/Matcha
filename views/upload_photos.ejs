@@ -1,3 +1,4 @@
+<%- include('./includes/header') %>
 <% if (user.completedPics == 1) { %>
     <%- include('./includes/header') %> 
 <% } %>
@@ -99,7 +100,6 @@
         });
         var user = document.querySelector("#username").innerHTML;
         var flag = document.querySelector("#flag").innerHTML;
-        console.log(flag);
         socket.emit('login', user);
 
         socket.on('notif', (notif, user, user2) => {

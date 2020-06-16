@@ -11,7 +11,7 @@ function sendEmail(username, key, email, type) {
     } else {
         var text = '<h1>Reset your Matcha password!</h1>' + '<p>Please click the following link to reset your password: </p>' + '<a href="http://localhost:5000/users/reset?username=' + username + '&key=' + key + '">RESET</a>';
     }
-        var flag = 1;
+    var flag = 1;
 
     transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -78,7 +78,7 @@ router.post('/register', (req, res) => {
             password,
             password2
         });
-   
+
     } else {
         User.findOne({ username: username }).then(user => {
             if (user) {
@@ -91,7 +91,7 @@ router.post('/register', (req, res) => {
                     email,
                     password,
                     password2
-                }); 
+                });
             } else {
                 User.findOne({ email: email }).then(user => {
                     if (user) {
@@ -115,7 +115,6 @@ router.post('/register', (req, res) => {
                             password,
                             key
                         });
-        
                         bcrypt.genSalt(10, (err, salt) => {
                             bcrypt.hash(newUser.password, salt, (err, hash) => {
                                 if (err) throw err;
@@ -148,10 +147,10 @@ router.post('/register', (req, res) => {
                         });
                     }
                 })
-                .catch(err => console.log(err));
+                    .catch(err => console.log(err));
             }
         })
-        .catch(err => console.log(err));
+            .catch(err => console.log(err));
     }
 });
 
@@ -182,17 +181,17 @@ router.get('/check', (req, res) => {
             }
         }
     })
-    .catch(err => console.log(err));
+        .catch(err => console.log(err));
 });
 
 // Login
-router.post('/login', passport.authenticate('local', { failureRedirect: '/users/login' , failureFlash: true }), (req, res, next) => {
+router.post('/login', passport.authenticate('local', { failureRedirect: '/users/login', failureFlash: true }), (req, res, next) => {
     res.redirect('/users/check?user=' + req.user.username);
 });
 
 // Logout
 router.get('/logout', (req, res) => {
-    User.updateOne({ username: req.user.username }, { $set: { online: false, lastOnline: Date.now()}}).then(() => {
+    User.updateOne({ username: req.user.username }, { $set: { online: false, lastOnline: Date.now() } }).then(() => {
         let user = req.user.username;
         req.logout();
         req.flash('success_msg', 'You are now logged out!');
@@ -206,7 +205,7 @@ router.get('/activate', (req, res) => {
     const key = req.query.key;
     const usernameLink = req.query.username;
     User.find({ username: usernameLink }).then(user => {
-        if(user[0]) { 
+        if (user[0]) {
             if (user[0].activated == 1) {
                 req.flash(
                     'error_msg',
@@ -215,21 +214,21 @@ router.get('/activate', (req, res) => {
                 res.redirect('/users/login');
             }
             else if (user[0].key == key) {
-                User.updateOne({ username: usernameLink }, { $set: { activated: 1 }}).then(() => {
+                User.updateOne({ username: usernameLink }, { $set: { activated: 1 } }).then(() => {
                     req.flash(
                         'success_msg',
                         'Your account has been activated! Please log in'
                     );
                     res.redirect('/users/login');
                 })
-                .catch(err => console.log(err));    
+                    .catch(err => console.log(err));
             } else {
                 req.flash(
                     'error_msg',
                     'Something went wrong... Please click the link you received by email!'
                 );
                 res.redirect('/users/login');
-            } 
+            }
         } else {
             req.flash(
                 'error_msg',
@@ -249,7 +248,7 @@ router.post('/newpwd', (req, res) => {
     User.findOne({ email: email }).then(user => {
         if (user) {
             const key = uniqid();
-            User.updateOne({ email: email }, { $set: { key: key }}).then(() => {
+            User.updateOne({ email: email }, { $set: { key: key } }).then(() => {
                 if (sendEmail(user.username, key, email, "newpwd")) {
                     req.flash(
                         'success_msg',
@@ -323,7 +322,7 @@ router.post('/reset', (req, res) => {
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(pwd, salt, (err, hash) => {
                 if (err) throw err;
-                User.updateOne({ username: username }, { $set: { password: hash }}).then(() => {
+                User.updateOne({ username: username }, { $set: { password: hash } }).then(() => {
                     req.flash(
                         'success_msg',
                         'Your password has been updated!'

@@ -125,7 +125,7 @@
                 <div class="row">
                     <a class="profile-link" href="/profile?user=<%= profile.username %>&page=1">
                         <div class="column-explore1">
-                            <img class="images-explore" src="<%= '/uploads/' + profile.p1 %>" onerror="this.onerror=null; this.src='/img/image-not-available.jpg'">
+                            <img class="images-explore" src="<%= profile.bot == true ? profile.p1 : '/uploads/' + profile.p1 %>" onerror="this.onerror=null; this.src='/img/image-not-available.jpg'">
                         </div>
                     </a> 
                     <div class="column-explore2">

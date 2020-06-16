@@ -10,7 +10,7 @@
             <div class="gallery">
                 <a href="/profile?user=<%= profile.username %>&page=1">
                     <div class="column-explore1">
-                        <img src="/uploads/<%= profile.p1 %>" onerror="this.onerror=null; this.src='/img/image-not-available.jpg'" class="images-explore">
+                        <img src="<%= profile.bot == true? profile.p1 : /uploads/ + profile.p1 %>" onerror="this.onerror=null; this.src='/img/image-not-available.jpg'" class="images-explore">
                     </div>
                 </a>
                 <div class="desc"><h4><%= profile.fname %></h4></div>

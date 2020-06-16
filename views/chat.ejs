@@ -19,7 +19,7 @@
             <div id="namespace" class="clearfix float">
                 <div class="image-cropper">
                     <a class="profile-link" href="/profile?user=<%= recip.username %>&page=1">
-                        <img src="/uploads/<%= recip.p1 %>" onerror="this.onerror=null; this.src='/img/image-not-available.jpg'" class="image-chat" width=100>
+                        <img src="<%= recip.bot == true ? recip.p1 : /uploads/ + recip.p1 %>" onerror="this.onerror=null; this.src='/img/image-not-available.jpg'" class="image-chat" width=100>
                     </a>
                 </div>
                 <h1 id="name"><%= recip.fname %></h1>

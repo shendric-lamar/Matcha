@@ -7,7 +7,10 @@ const passport = require('passport');
 const app = express();
 const uniqid = require('uniqid');
 const http = require('http').createServer(app);
-const io = require('socket.io')(http)
+const io = require('socket.io')(http);
+const faker = require('faker');
+const fakerModel = require('./models/seederSchema');
+// const faker = require('faker');
 
 // Set static folder
 app.use(express.static("public"));
@@ -60,7 +63,6 @@ const Room = require('./models/Room');
 io.sockets.on('connection', (socket) => {
 
     socket.on('login', (username) => {
-        console.log("connected");
         User.updateOne({ username: username }, { $set: { socket: socket.id, online: true } }).catch(err => console.log(error));
         Room.find({ $or: [{ user1: username }, { user2: username }] }).then(rooms => {
             rooms.forEach(room => {
@@ -177,7 +179,6 @@ io.sockets.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        console.log("disconnected");
         User.findOne({ socket: socket.id }).then(user => {
             if (user) {
                 User.updateOne({ username: user.username }, { $set: { online: false } }).then(() => {
@@ -193,6 +194,68 @@ io.sockets.on('connection', (socket) => {
     });
 });
 
+
+//seeders
+
+app.get('/seeders', (req, res) => {
+    fakerModel.find((err, data) => {
+        if (err) {
+            console.log(err)
+        }
+        else if (data) {
+            res.render('seeder', { data: data });
+        }
+        else {
+            res.render('seeder', { data: {} });
+        }
+    })
+})
+app.post('/seeders', (req, res) => {
+    for (i = 0; i < 500; i++) {
+        var gender = ["Male", "Female"];
+        var genderRandom = gender[Math.floor(Math.random() * gender.length)];
+        var orientation = ["Heterosexual", "Bisexual", "Homosexual"];
+        var orientationRandom = orientation[Math.floor(Math.random() * orientation.length)];
+        var coordinates = [];
+        coordinates[0] = Math.random() * (6 - (2)) + (2);
+        coordinates[1] = Math.random() * (53 - (49)) + (49);
+        var tags = [];
+        for (j = 0; j < 5; j++) {
+            tags[j] = faker.random.word();
+        }
+        var date = new Date(Date.now());
+        var dateMiny = date.getFullYear() - 18;
+        var dateMaxy = date.getFullYear() - 65;
+        var dateMin = dateMiny + '-01-01';
+        var dateMax = dateMaxy + '-01-01';
+        var fakee = new User({
+            fname: faker.name.firstName(),
+            lname: faker.name.lastName(),
+            username: faker.internet.userName(),
+            email: faker.internet.email(),
+            amount: 2,
+            p1: faker.image.avatar(),
+            p2: faker.image.avatar(),
+            password: faker.internet.password(),
+            activated: true,
+            completedInfo: true,
+            completedPics: true,
+            dob: faker.date.between(dateMax, dateMin),
+            orientation: orientationRandom,
+            gender: genderRandom,
+            bio: faker.lorem.sentence(),
+            tags: tags,
+            location: { coordinates: coordinates },
+            bot: true
+        });
+        fakee.save((err, data) => {
+            if (err) {
+                console.log(err)
+            }
+        });
+    }
+    res.redirect('/');
+})
 
 // Routes
 app.use('/', require('./routes/index'));

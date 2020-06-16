@@ -41,7 +41,7 @@
                         <% let j = user.amount; %>
                         <% if (pages[page - 1] != '') { %>
                         <% let photo = pages[page - 1]; %>
-                        <img src="/uploads/<%= photo %>" id="pimg" class="<%= (j == 1) ? 'rounded' : ''%>"
+                        <img src="<%= user.bot == true ? photo : '/uploads/' + photo %>" id="pimg" class="<%= (j == 1) ? 'rounded' : ''%>"
                             onerror="this.onerror=null; this.src='/img/image-not-available.jpg'" style="width:100%">
                         <% } %>
                     </div>
@@ -95,12 +95,12 @@
                             <h5 class="card-title last-online-profile">Last Online</h5>
                             <p class="card-text last-online-profile"><%= GetFormattedDate(user.lastOnline) %></p>
                             <% } %>
-                                <h5 class="card-title">Location</h5>
-                                <div id="maps" style="width: auto;height: 300px;"></div>
-                                <input id="lat" type="number" step="any" value="<%= user.location.coordinates[1] %>"
-                                    style="display: none;">
-                                <input id="lng" type="number" step="any" value="<%= user.location.coordinates[0] %>"
-                                    style="display: none;">
+                            <h5 class="card-title">Location</h5>
+                            <div id="maps" style="width: auto;height: 300px;"></div>
+                            <input id="lat" type="number" step="any" value="<%= user.location.coordinates[1] %>"
+                                style="display: none;">
+                            <input id="lng" type="number" step="any" value="<%= user.location.coordinates[0] %>"
+                                style="display: none;">
                         </div>
                     </div>
                     <% if (flag != 1) { %>
@@ -197,11 +197,11 @@
     });
 
     function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition);
-            } else {
-                console.log("Geolocation is not supported by this browser.");
-            }
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+            console.log("Geolocation is not supported by this browser.");
+        }
     }
     function showPosition(position) {
         var dblat = parseFloat(document.getElementById("lat").value);

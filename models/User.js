@@ -45,13 +45,13 @@ const UserSchema = new mongoose.Schema({
     },
     gender: {
         type: String,
-        enum: ["male", "female"],
-        default: "male"
+        enum: ["Male", "Female"],
+        default: "Male"
     },
     orientation: {
         type: String,
-        enum: ["heterosexual", "bisexual", "homosexual"],
-        default: "bisexual"
+        enum: ["Heterosexual", "Bisexual", "Homosexual"],
+        default: "Heterosexual"
     },
     bio: {
         type: String,
@@ -146,17 +146,16 @@ const UserSchema = new mongoose.Schema({
         default: true
     },
     location: {
-        type: {
-            type: String,
-            default: "Point",
-        },
         coordinates: {
             type: [Number], //Coordinates lng then lat for $near to work
             default: 0,
         },
     },
+    bot: {
+        type: Boolean,
+        default: false
+    }
 });
-UserSchema.index({ location: '2dsphere' });
 
 const User = mongoose.model('User', UserSchema);
 

@@ -64,7 +64,7 @@ router.get('/edit', ensureAuthenticated, ensureCompleted, (req, res) => {
 });
 
 router.post('/edit', (req, res) => {
-    const { fname, lname, username, gender, orientation, tags, bio, lat, lng, showLoc} = req.body;
+    const { fname, lname, username, gender, orientation, tags, bio, lat, lng, showLoc } = req.body;
     let errors = [];
 
     if (!fname || !lname || !username || !gender || !orientation || !bio || !tags || !showLoc || !lat || !lng) {
@@ -120,7 +120,7 @@ router.post('/edit', (req, res) => {
                 } else {
                     loc = true;
                 }
-                User.updateOne({ username: req.user.username }, { $set: { fname: fname, lname: lname, username: username, gender: gender, orientation: orientation, tags: tagsArray, bio: bio.trim(), location: { coordinates: [lng, lat] }, showLoc: loc } }).then(() => {
+                User.updateOne({ username: req.user.username }, { $set: { fname: fname, lname: lname, username: username, gender: gender, orientation: orientation, tags: tagsArray, bio: bio.trim(), coordinates: [lng, lat], showLoc: loc } }).then(() => {
                     req.flash(
                         'success_msg',
                         'Your profile has been updated!'

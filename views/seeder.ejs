@@ -1,16 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-
-<body>
-    <form action="seeders" method="POST">
-        <input type="submit" value="Click to insert data in DB">
-    </form> <br>
-</body>
-
-</html>
+<div class="row mt-5">
+    <div class="col-md-6 m-auto">
+        <div class="card card-body jumbotron">
+            <h1 class="text-center mb-3">Initialize Fake User Database</h1>
+            <%- include('./partials/messages') %>
+            <form action="seeders" method="POST">
+                <div class="form-group">
+                    <label for="amount">Amount of users (1 - 1.000)</label>
+                    <input type="number" id="amount" name="amount" class="form-control" min="1" max="1000"/>
+                </div>
+                <div class="form-group">
+                    <label for="minlat">Minimum Latitude (-90 - 90)</label>
+                    <input type="number" id="minlat" name="minlat" class="form-control" min="-90" max="90"/>
+                </div>
+                <div class="form-group">
+                    <label for="maxlat">Maximum Latitude (-90 - 90)</label>
+                    <input type="number" id="maxlat" name="maxlat" class="form-control" min="-90" max="90"/>
+                </div>
+                <div class="form-group">
+                    <label for="minlong">Minimum Longitude (-180 - 180)</label>
+                    <input type="number" id="minlong" name="minlong" class="form-control" min="-180" max="180"/>
+                </div>
+                <div class="form-group">
+                    <label for="maxlong">Maximum Longitude (-180 - 180)</label>
+                    <input type="number" id="maxlong" name="maxlong" class="form-control" min="-180" max="180"/>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>

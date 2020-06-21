@@ -120,7 +120,7 @@ router.post('/edit', (req, res) => {
                 } else {
                     loc = true;
                 }
-                User.updateOne({ username: req.user.username }, { $set: { fname: fname, lname: lname, username: username, gender: gender, orientation: orientation, tags: tagsArray, bio: bio.trim(), coordinates: [lng, lat], showLoc: loc } }).then(() => {
+                User.updateOne({ username: req.user.username }, { $set: { fname: fname, lname: lname, username: username, gender: gender, orientation: orientation, tags: tagsArray, bio: bio.trim(), location: { coordinates: [lng, lat] }, showLoc: loc } }).then(() => {
                     req.flash(
                         'success_msg',
                         'Your profile has been updated!'

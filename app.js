@@ -211,14 +211,20 @@ app.get('/seeders', (req, res) => {
     })
 })
 app.post('/seeders', (req, res) => {
-    for (i = 0; i < 500; i++) {
+    let errors = [];
+    const { amount, minlat, maxlat, minlong, maxlong } = req.body;
+    if (minlat > maxlat || minlong > maxlong) {
+        errors.push({ msg: 'Maximum latitude/longitude should be larger than minimum latitude/longitude!' });
+        res.render('seeders', errors);
+    }
+    for (i = 0; i < amount; i++) {
         var gender = ["Male", "Female"];
         var genderRandom = gender[Math.floor(Math.random() * gender.length)];
         var orientation = ["Heterosexual", "Bisexual", "Homosexual"];
         var orientationRandom = orientation[Math.floor(Math.random() * orientation.length)];
         var coordinates = [];
-        coordinates[0] = Math.random() * (6 - (2)) + (2);
-        coordinates[1] = Math.random() * (53 - (49)) + (49);
+        coordinates[0] = Math.random() * (maxlong * 1 - minlong * 1 + 1) + minlong * 1;
+        coordinates[1] = Math.random() * (maxlat * 1 - minlat * 1 + 1) + minlat * 1;
         var tags = [];
         for (j = 0; j < 5; j++) {
             tags[j] = faker.random.word();
